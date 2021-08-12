@@ -23,7 +23,7 @@
 ## Start the user stories!
 
 - Story: As a developer I can create an animal model in the database. An animal has the following information: common name, latin name, kingdom (mammal, insect, etc.).
-    - by using the g resource commande, Rails will create just about everything that we need to start working with animals as a data source. 
+    - by using the g resource command, Rails will create just about everything that we need to start working with animals as a data source. 
             - it setted up the migration file
             - it setted up the model
             - it created a controller
@@ -55,10 +55,11 @@ Hint: Make a few animals using Rails Console
             http://localhost:3000/animals
 
 - Story: As the consumer of the API I can update an animal in the database.
-    - need to create a edit method inside the controller
+    - need to create an update method inside the controller
     ```
-    def edit
+    def update
         animal = Animal.find(params[:id])
+        animal.update(animal_params)
         if animal.valid?
             render json: animal
         else
@@ -68,19 +69,17 @@ Hint: Make a few animals using Rails Console
     ```
     - to check for the route on postman (!!! ASK SARA!)
         - use the $ rails routes command to check the routes that were set up already! 
-        - /animals/:id/edit
-    - Message form terminal after sending the GET request from Postman. --->  Started GET "/animals/3/edit" for ::1 at 2021-08-12 11:41:11 -0700
-    Processing by AnimalsController#edit as */*
-    Parameters: {"id"=>"3", "animal"=>{}}
-    Animal Load (1.0ms)  SELECT "animals".* FROM "animals" WHERE "animals"."id" = $1 LIMIT $2  [["id", 3], ["LIMIT", 1]]
-    ↳ app/controllers/animals_controller.rb:7:in `edit'
-    Completed 200 OK in 17ms (Views: 0.7ms | ActiveRecord: 5.5ms | Allocations: 3721)
+        - /animals/:id
+    - this is a PATCH request
+        - make sure to pass in your info in the body as json
+        - http://localhost:3000/animals/5
+    - ! Now this thing is working!!!!
 
 - Story: As the consumer of the API I can destroy an animal in the database.
     - define the destroy method
     def destroy
         animal = Animal.find(params[:id])
-        if animal.valid?
+        if animal.destroy
             render json: animal
         else
             render json: animal.errors
@@ -98,13 +97,9 @@ Hint: Make a few animals using Rails Console
                      ```
                      skip_before_action :verify_authenticity_token
                      ```
-    - Now the delete request from postman is working. Message from the termial bellow:
-        - Started DELETE "/animals/3/" for ::1 at 2021-08-12 12:20:41 -0700
-        Processing by AnimalsController#destroy as */*
-        Parameters: {"id"=>"3", "animal"=>{}}
-        Animal Load (1.5ms)  SELECT "animals".* FROM "animals" WHERE "animals"."id" = $1 LIMIT $2  [["id", 3], ["LIMIT", 1]]
-        ↳ app/controllers/animals_controller.rb:15:in `destroy'
-        Completed 200 OK in 17ms (Views: 0.9ms | ActiveRecord: 12.4ms | Allocations: 3822)
+    - this is a DELETE request
+        - http://localhost:3000/animals/4
+        - it is working!!!
 - Story: As the consumer of the API I can create a new animal in the database.
     - define create method inside controller
     ```
@@ -118,24 +113,45 @@ Hint: Make a few animals using Rails Console
     end
     ```
     - now we can check the endpoint using PostMan
-        - remember that is is a GET request
-        - this is the message in the termial after testing with PostMan
-        - app/controllers/animals_controller.rb:24:in `create'
-        Started POST "/animals" for ::1 at 2021-08-12 13:09:25 -0700
-        Processing by AnimalsController#create as */*
-        Parameters: {"common_name"=>"Elephant", "latin_name"=>"the lating name", "kingdom"=>"Some kingdom", "animal"=>{"common_name"=>"Elephant", "latin_name"=>"the lating name", "kingdom"=>"Some kingdom"}}
-        TRANSACTION (0.7ms)  BEGIN
-    ↳ app/controllers/animals_controller.rb:23:in `create'
-    Animal Create (1.9ms)  INSERT INTO "animals" ("common_name", "latin_name", "kingdom", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"  [["common_name", "Elephant"], ["latin_name", "the lating name"], ["kingdom", "Some kingdom"], ["created_at", "2021-08-12 20:09:25.422676"], ["updated_at", "2021-08-12 20:09:25.422676"]]
-    ↳ app/controllers/animals_controller.rb:23:in `create'
-    TRANSACTION (30.0ms)  COMMIT
-    ↳ app/controllers/animals_controller.rb:23:in `create'
-    Completed 200 OK in 47ms (Views: 0.9ms | ActiveRecord: 38.2ms | Allocations: 5142)
-    - Create method is working
+        - remember that is is a POST request
+        - pass in your data using json format in the body (postman)
+        - http://localhost:3000/animals
+    - Create method is working !!!
     
 - Story: As the consumer of the API I can create a sighting of an animal with date (use the datetime datatype), a latitude, and a longitude.
 Hint: An animal has_many sightings. (rails g resource Sighting animal_id:integer ...)
+    - create a model for Sighting
+    - ! should we use decimal data type for latitude and longitude? can we use precision?
+    - ex: :decimal, { precision: 10, scale: 6 }
+
+    - $ rails g resource Sighting date:datetime latitude:decimal longitude:decimal animal_id:integer
+
+    - $ rails db:migrate
+        - NOW we have a schema file with both tables:
+            - animal
+            - sighting
+    - Now we can make the Active Records Association
+        - inside the Animal model folder
+            ```
+            class Animal < ApplicationRecord
+                has_many :sightings
+            end
+            ```
+        - inside the Sightings model folder
+            ```
+            class Sighting < ApplicationRecord
+                belongs_to :animal
+            end
+            ```
+    - ! NOW our app is expecting this relationship!
+    - Lets create the sightings for the Butterfly
+        - $ rails c
+        - $ myButterfly = Animal.find(3)
+        - $ myButterfly.sightings.create date: DateTime.now, latitude: 31.1, longitude: -117.4
+            - nice! now we can create sightings for our animals like that.... form the rails console. It is working. How do we test it in postman?
+            
 - Story: As the consumer of the API I can update an animal sighting in the database.
+    - 
 - Story: As the consumer of the API I can destroy an animal sighting in the database.
 - Story: As the consumer of the API, when I view a specific animal, I can also see a list sightings of that animal.
 Hint: Checkout the Ruby on Rails API docs on how to include associations.
