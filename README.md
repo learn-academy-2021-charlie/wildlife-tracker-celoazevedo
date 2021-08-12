@@ -35,8 +35,44 @@
     - $ db:migrate
 - Story: As the consumer of the API I can see all the animals in the database.
 Hint: Make a few animals using Rails Console
+    - first we created a few animal instances to feed our database
+        - $ rails c
+        - $ Animal.create common_name: 'Butterfly', latin_name: 'Rhopalocera', kingdom: 'Animalia'
+    - Now we need to define the index method inside of our animal controller
+        ```
+        def index
+            animal = Animal.all
+            render json: animal
+        end
+        ```
+    - !! To confirm if we are indeed getting the data back!! We will use Postman!!! -- this tool will create requests and responses and we can see the responses to make sure our app is working!
+        - web.postman.co
+        - under workspace 
+        - in the headers tab
+            - KEY -> Content-Type
+            - Value -> application/json
+        - this is a GET request to 
+            http://localhost:3000/animals
+
 - Story: As the consumer of the API I can update an animal in the database.
+    - need to create a edit method inside the controller
+    ```
+    def edit
+        @animal = Animal.find(params[:id])
+    end
+    ```
+    - to check for the route on postman (!!! ASK SARA!)
+        - use the $ rails routes command to check the routes that were set up already! 
+        - /animals/:id/edit
+    - Message form terminal after sending the GET request from Postman. --->  Started GET "/animals/3/edit" for ::1 at 2021-08-12 11:41:11 -0700
+    Processing by AnimalsController#edit as */*
+    Parameters: {"id"=>"3", "animal"=>{}}
+    Animal Load (1.0ms)  SELECT "animals".* FROM "animals" WHERE "animals"."id" = $1 LIMIT $2  [["id", 3], ["LIMIT", 1]]
+    ↳ app/controllers/animals_controller.rb:7:in `edit'
+    Completed 200 OK in 17ms (Views: 0.7ms | ActiveRecord: 5.5ms | Allocations: 3721)
+
 - Story: As the consumer of the API I can destroy an animal in the database.
+    - 
 - Story: As the consumer of the API I can create a new animal in the database.
 - Story: As the consumer of the API I can create a sighting of an animal with date (use the datetime datatype), a latitude, and a longitude.
 Hint: An animal has_many sightings. (rails g resource Sighting animal_id:integer ...)
