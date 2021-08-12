@@ -58,7 +58,12 @@ Hint: Make a few animals using Rails Console
     - need to create a edit method inside the controller
     ```
     def edit
-        @animal = Animal.find(params[:id])
+        animal = Animal.find(params[:id])
+        if animal.valid?
+            render json: animal
+        else
+            render json: animal.errors
+        end
     end
     ```
     - to check for the route on postman (!!! ASK SARA!)
@@ -72,7 +77,34 @@ Hint: Make a few animals using Rails Console
     Completed 200 OK in 17ms (Views: 0.7ms | ActiveRecord: 5.5ms | Allocations: 3721)
 
 - Story: As the consumer of the API I can destroy an animal in the database.
-    - 
+    - define the destroy method
+    def destroy
+        animal = Animal.find(params[:id])
+        if animal.valid?
+            render json: animal
+        else
+            render json: animal.errors
+        end
+    end
+    - and the private settup in our controller for another leayer of security to our db
+        private
+        def animal_params
+            params.require(:animal).permit(:common_name, :latin_name, :kingdom)
+        end
+    - Now lets check a DELETE request on POstMan
+        - it is getting a message on the termial of authenticity error!
+            need to set up an authenticaiton token 
+                - inside the application controller
+                     ```
+                     skip_before_action :verify_authenticity_token
+                     ```
+    - Now the delete request from postman is working. Message from the termial bellow:
+        - Started DELETE "/animals/3/" for ::1 at 2021-08-12 12:20:41 -0700
+        Processing by AnimalsController#destroy as */*
+        Parameters: {"id"=>"3", "animal"=>{}}
+        Animal Load (1.5ms)  SELECT "animals".* FROM "animals" WHERE "animals"."id" = $1 LIMIT $2  [["id", 3], ["LIMIT", 1]]
+        ↳ app/controllers/animals_controller.rb:15:in `destroy'
+        Completed 200 OK in 17ms (Views: 0.9ms | ActiveRecord: 12.4ms | Allocations: 3822)
 - Story: As the consumer of the API I can create a new animal in the database.
 - Story: As the consumer of the API I can create a sighting of an animal with date (use the datetime datatype), a latitude, and a longitude.
 Hint: An animal has_many sightings. (rails g resource Sighting animal_id:integer ...)
