@@ -35,7 +35,27 @@
     - $ db:migrate
 - Story: As the consumer of the API I can see all the animals in the database.
 Hint: Make a few animals using Rails Console
+    - first we created a few animal instances to feed our database
+        - $ rails c
+        - $ Animal.create common_name: 'Butterfly', latin_name: 'Rhopalocera', kingdom: 'Animalia'
+    - Now we need to define the index method inside of our animal controller
+        ```
+        def index
+            animal = Animal.all
+            render json: animal
+        end
+        ```
+    - !! To confirm if we are indeed getting the data back!! We will use Postman!!! -- this tool will create requests and responses and we can see the responses to make sure our app is working!
+        - web.postman.co
+        - under workspace 
+        - in the headers tab
+            - KEY -> Content-Type
+            - Value -> application/json
+        - this is a GET request to 
+            http://localhost:3000/animals
+
 - Story: As the consumer of the API I can update an animal in the database.
+    - 
 - Story: As the consumer of the API I can destroy an animal in the database.
 - Story: As the consumer of the API I can create a new animal in the database.
 - Story: As the consumer of the API I can create a sighting of an animal with date (use the datetime datatype), a latitude, and a longitude.
