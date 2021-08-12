@@ -106,6 +106,32 @@ Hint: Make a few animals using Rails Console
         ↳ app/controllers/animals_controller.rb:15:in `destroy'
         Completed 200 OK in 17ms (Views: 0.9ms | ActiveRecord: 12.4ms | Allocations: 3822)
 - Story: As the consumer of the API I can create a new animal in the database.
+    - define create method inside controller
+    ```
+     def create
+        animal = Animal.create(animal_params)
+        if aimal.valid?
+            render json: animal
+        else 
+            render json: animal.errors
+        end
+    end
+    ```
+    - now we can check the endpoint using PostMan
+        - remember that is is a GET request
+        - this is the message in the termial after testing with PostMan
+        - app/controllers/animals_controller.rb:24:in `create'
+        Started POST "/animals" for ::1 at 2021-08-12 13:09:25 -0700
+        Processing by AnimalsController#create as */*
+        Parameters: {"common_name"=>"Elephant", "latin_name"=>"the lating name", "kingdom"=>"Some kingdom", "animal"=>{"common_name"=>"Elephant", "latin_name"=>"the lating name", "kingdom"=>"Some kingdom"}}
+        TRANSACTION (0.7ms)  BEGIN
+    ↳ app/controllers/animals_controller.rb:23:in `create'
+    Animal Create (1.9ms)  INSERT INTO "animals" ("common_name", "latin_name", "kingdom", "created_at", "updated_at") VALUES ($1, $2, $3, $4, $5) RETURNING "id"  [["common_name", "Elephant"], ["latin_name", "the lating name"], ["kingdom", "Some kingdom"], ["created_at", "2021-08-12 20:09:25.422676"], ["updated_at", "2021-08-12 20:09:25.422676"]]
+    ↳ app/controllers/animals_controller.rb:23:in `create'
+    TRANSACTION (30.0ms)  COMMIT
+    ↳ app/controllers/animals_controller.rb:23:in `create'
+    Completed 200 OK in 47ms (Views: 0.9ms | ActiveRecord: 38.2ms | Allocations: 5142)
+    - Create method is working
     
 - Story: As the consumer of the API I can create a sighting of an animal with date (use the datetime datatype), a latitude, and a longitude.
 Hint: An animal has_many sightings. (rails g resource Sighting animal_id:integer ...)
