@@ -106,6 +106,7 @@ Hint: Make a few animals using Rails Console
         ↳ app/controllers/animals_controller.rb:15:in `destroy'
         Completed 200 OK in 17ms (Views: 0.9ms | ActiveRecord: 12.4ms | Allocations: 3822)
 - Story: As the consumer of the API I can create a new animal in the database.
+    
 - Story: As the consumer of the API I can create a sighting of an animal with date (use the datetime datatype), a latitude, and a longitude.
 Hint: An animal has_many sightings. (rails g resource Sighting animal_id:integer ...)
 - Story: As the consumer of the API I can update an animal sighting in the database.
